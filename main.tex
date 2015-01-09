@@ -1,0 +1,62 @@
+\documentclass{report}
+\usepackage{hyperref}
+\usepackage{listings}
+\usepackage{color}
+\usepackage{multirow}
+
+\definecolor{dkgreen}{rgb}{0,0.6,0}
+\definecolor{gray}{rgb}{0.5,0.5,0.5}
+\definecolor{pink}{rgb}{1,0.07,0.57}
+
+\lstset{frame=tb,
+  language=Java,
+  aboveskip=3mm,
+  belowskip=3mm,
+  showstringspaces=false,
+  columns=flexible,
+  basicstyle={\small\ttfamily},
+  numbers=none,
+  numberstyle=\tiny\color{blue},
+  keywordstyle=\color{pink},
+  commentstyle=\color{dkgreen},
+  stringstyle=\color{blue},
+  breaklines=true,
+  breakatwhitespace=true
+  tabsize=3
+}
+
+\lstset{language=Java}
+
+\title{Secure Coding - Team 7- Phase 4}
+\author{Magnus Jahnen, Thomas Krex, Elias Tatros}
+\date{\today}
+
+
+\begin{document}
+
+\maketitle
+
+\part{Executive Summary}
+TODO
+
+
+\tableofcontents
+
+\part{Time Tracking Table}
+\include{time_tracking_table}
+
+\part{Most Important Observations}
+\include{most_important_observations}
+
+\part{Vulnerabilities}
+
+\part{Reverse Engineering}
+\include{c_reverse}
+\include{java_reverse}
+
+\part*{Appendix}
+\addcontentsline{toc}{part}{Appendix}
+\appendix
+\input{appendix}
+
+\end{document}
