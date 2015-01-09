@@ -151,3 +151,9 @@ The \textit{getline} method of the \textit{ifstream} class takes a buffer and a 
 \subsubsection{strcpy}
 
 Normally \textit{strcpy} would allow stack overflows, because it only looks at the null terminator for a string ending, not on the actual buffer size of the destination buffer. But in this case the terminating null character will always be at a place where it does not exceed the destination buffer size, because of the \textit{getline} call before. The \textit{getline} only reads as much bytes as fit in the buffer and then adds a terminating null character at the end. That means the \textit{strcpy} call will always stop at the null terminator which will not be misplaced or missing! Same applies to the \textit{strtok} function, which always stops at the null termination.
+
+\section{Conclusion}
+
+The C-Parser is, reading security vulnerabilities, pretty robust. Not only because it was kept clean, small and simple, but also because obvious precautions have been implemented. The \textit{gcc} option \textit{}, for example, protects the stack from being overflowed. A further precaution is the check against the actual size of a buffer, to avoid stack overflows.
+
+All in all we have no recommendations to make the C-Parser harder to exploit.
