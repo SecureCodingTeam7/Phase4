@@ -1,1 +1,153 @@
 \chapter{C-Program}
+
+\section{Observation}
+
+The C-Parser to parse batch files is pretty simple. It takes a simple structured text file, parses the information in this file and puts out these information on the standard output in JSON format. That means the C-Parser does not have to do any complex tasks, like validating the given input or entering these information into the database. It just converts the input into another format (JSON).
+
+\subsection{Batch File Format}
+
+Listing \ref{listing:batch_example} shows an example of an batch file the parser gets as input. The first line has to contain the 15-digit TAN, if there is any TAN. The following lines contain two infomation split by an space. The first information is the amount, the second the number of the receiving account. All other lines which do not conform to the format described above will be ignored and not part of the JSON output.
+
+\begin{lstlisting}[caption=Input Batch File,label=listing:batch_example]
+123456789012345 // optional TAN
+123 123123123
+123123 123
+123123 123123
+\end{lstlisting}
+
+\subsection{JSON Output}
+
+Listing \ref{listing:json_output} shows the JSON output of the parser according to Listing \ref{listing:batch_example}. The first line shows the output if a TAN is included, the second without a TAN. The JSON is pretty simple, on the first level there is a TAN which can be an empty string or the TAN, if any. There \textit{transaction} key delivers a list of dictionaries, which are the second level. In these dictionaries are always two entries. The account number of the receiving account and the amount to transfer. The actual parsing, validation and adding the information to the database is then done by the PHP program.
+
+\begin{lstlisting}[caption=JSON Output,label=listing:json_output]
+{"tan": "123456789012345", "transactions": [{"account": "123", "amount": "123123123"}, {"account": "123123", "amount": "123"}, {"account": "123123", "amount": "123123"}]}
+{"tan": "", "transactions": [{"account": "123", "amount": "123123123"}, {"account": "123123", "amount": "123"}, {"account": "123123", "amount": "123123"}]}
+\end{lstlisting}
+
+\section{Discovery}
+
+To reverse engineer the code of the parser we used different versions of IDA (Pro) for Linux and Windows (Wine). First steps we performed were debugging the parser in IDA in order to gain an overall knowledge about how the program flow is, i.e. how does it react to invalid files or input. Next we tried to evaluate how the program flows within valid files. That means we wanted to understand conditions and loops.
+
+After that we tried to write some C Code to imitate the parser. Therefore we began writing simple code for opening and reading the file, then we compiled it and disassembled it with IDA and compared the original disassembly of the actual parser and our clone. As soon as we were satisfied with the result, we continued with the other parts of the parser.
+
+During this process we recognized that the original parser was compiled with the \textit{gcc} option \textit{fstack-protector(-all)}. This activates protection of the stack against stack smashing with the help of canary values. This makes it more difficult for an attacker to exploit buffer overflows.
+
+\section{Analysis of the Reverse Engineered Code}
+
+Listing \ref{listing:c_code}  shows the code we reverse engineered from the parser executable file. The program is pretty straight forward. It first checks if the file to parse is valid and can be accessed via the program. After that it begins reading from the file via the class \textit{ifstream} from the standard C++ library. If the first line contains 15 and no space elements the parser knows that it is TAN. Otherwise it parses the account number and the amount from that line. Further lines will be treat as if they contain account number and amount.
+
+\begin{lstlisting}[caption=Reverse Engineered C-Code of the parser,label=listing:c_code]
+#include <iostream>
+#include <fstream>
+
+#include <unistd.h>
+#include <string.h>
+
+using namespace std;
+
+int main(int argc, char **argv) {
+	
+	if(access(argv[1], R_OK)) {
+		cout << "{}";
+		return 0;
+	}
+	
+	ifstream file;
+	file.open(argv[1]);
+	
+	if(!file.good()) {
+		cout << "{}";
+		return 0;
+	}
+	
+	char buffer[0x1A];
+	char dest[0x1A];
+	bool tanAlreadyRead = false;
+	bool appendToList = false;
+	
+	cout << "{";
+	
+	while(!file.eof()) {
+		
+		if(!tanAlreadyRead) {
+			strcpy(dest, buffer);
+			file.getline(buffer, 0x1A);
+			char *token = strtok(buffer, " ");
+			
+			if(file.fail() || !token) {
+				cout << "}";
+				return 0;
+			}
+			
+			string tokenstr = string(token);
+			if(tokenstr.length() == 15) {
+				cout << "\"tan\": \"";
+				cout << token;
+				cout << "\", \"transactions\": [";
+				tanAlreadyRead = true;
+			} else {
+				cout << "\"tan\": \"\", \"transactions\": [";
+				
+				char *acc = strtok(dest, " ");
+				
+				if(acc) {
+					char *amount = strtok(NULL, " ");
+					
+					if(amount) {
+						cout << "{\"account\": \"";
+						cout << acc;
+						cout << "\", \"amount\": \"";
+						cout << amount;
+						cout << "\"}";
+						appendToList = true;
+					}
+				}
+				tanAlreadyRead = true;
+			}
+		} else {
+			if(file.fail())
+				break;
+			
+			file.getline(buffer, 0x1A);
+				
+			char *acc = strtok(buffer, " ");
+				
+			if(acc) {
+				char *amount = strtok(NULL, " ");
+					
+				if(amount) {
+					if(!appendToList) {
+						cout << "{\"account\": \"";
+						cout << acc;
+						cout << "\", \"amount\": \"";
+						cout << amount;
+						cout << "\"}";
+						appendToList = true;
+					} else {
+						cout << ", {\"account\": \"";
+						cout << acc;
+						cout << "\", \"amount\": \"";
+						cout << amount;
+						cout << "\"}";
+					}
+				}
+			}
+		}
+	}
+	
+	cout << "]";
+	cout << "}";
+	
+	return 0;
+}
+\end{lstlisting}
+
+Regarding buffer overflows the statements which contain the \textit{getline} and \textit{strcpy} directives (stack overflow)  are interesting. Heap overflows are not possible, because all memory is allocated on the stack and not the heap (no \textit{new} or \textit{malloc}).
+
+\subsubsection{getline}
+
+The \textit{getline} method of the \textit{ifstream} class takes a buffer and a size as arguments. The buffer will have a terminating null character at its end regardless if the line read has to be truncated or not. That means the buffer is always null terminated. The \textit{getline} method will only read as much bytes as the \textit{size} argument suggest to avoid buffer overflows. That means stack overflows are not possible here.
+
+\subsubsection{strcpy}
+
+Normally \textit{strcpy} would allow stack overflows, because it only looks at the null terminator for a string ending, not on the actual buffer size of the destination buffer. But in this case the terminating null character will always be at a place where it does not exceed the destination buffer size, because of the \textit{getline} call before. The \textit{getline} only reads as much bytes as fit in the buffer and then adds a terminating null character at the end. That means the \textit{strcpy} call will always stop at the null terminator which will not be misplaced or missing! Same applies to the \textit{strtok} function, which always stops at the null termination.
