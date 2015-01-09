@@ -7,3 +7,9 @@ The Java-SCS program is responsible for generating TAN codes when the user chose
 After starting the SmartCardSimulator, the user can open his personal SmartCard file. To do that, he has to enter his PIN. The SmartCard file is protected (AES-128 encrypted) and can only be read properly if the correct PIN was entered. Unfortunately the SCS does not recognize if the PIN was correct or not. It just generates TANs with a wrong PIN, and the NEXT9Bank Website then tells you if the TAN was correct or not. Another problem is that the SmartCard file is updated/changed whenever a TAN was generated. Thus, if entering a wrong PIN, the SmartCard file is corrupted, and cannot be used for further generation of TANs. The user has to download the SmartCard file again from the Website.
 
 After opening a valid SmartCard file, the user can create TANs fro single transactions or batch file transactions. For single transactions he has to enter the account numbers of the sender and receiver account and an amount. Fir batch transactions he has to choose a batch file and to enter the sender's account number. Batch files are not validated by the SCS, the user can choose a random file and gets TANs generated for it.
+
+\section{Discovery}
+
+The Java-SCS can be easily decompiled using \textit{jd-gui} can the \textit{eclipse} plugin of \textit{jd}. The resulting code looks pretty good, variable names are still the original ones, the strcuture of packages and classes has been kept and the code is easily understandable who has experience in Java development.
+
+The UI is based on \textit{JavaFX} and the \textit{Google Core Libraries for Java 1.6+} (guava-libraries)\footnote{\url{https://code.google.com/p/guava-libraries/}} are also included as well as \textit{controlsfx}. For building maven was used.
