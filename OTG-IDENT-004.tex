@@ -1,0 +1,69 @@
+\chapter{Testing for Account Enumeration and Guessable User Account (OTG-IDENT-004)}
+\subsection{Observation}
+Existing User accounts can be guessed via bruteforce attacks. There are tow ways to do it. One way is to use the blocking mechanism, which sends a message to the user after 3 unsuccessful attempts. Therefore the attacker is able to find valid user accounts.
+A second and even easier way is to use the  password recovery function. There you get immediately an negative feedback if you are inserting a non existing account email address and a positive feedback for a existing  one.
+
+
+Likelihood: high \newline
+
+Impact: low\newline
+
+Risk: medium\newline
+
+\subsection{Discovery}
+This vulnerability was found in login.php, where a blocking mechanism is implemented, shown in Listing \ref{listing:blocking}.  Each user has a field for unsuccessful login attempts. If this number is greater equal a predefined threshold, the browser  receives a JSON file containing a message which is displayed via javascript.
+\begin{lstlisting}[caption= Blocking Mechanism in login.php line 54-59 ,label=listing:blocking]
+// Check if user is blocked
+if( $user->getBlocked() >= USER_MAX_LOGIN_FAILED ) {
+$parser->setStatusCode( STATUS_CODE_ERROR )
+->setStatusMessage( ERROR_ACCOUNT_BLOCKED )
+->parse();
+}
+\end{lstlisting}
+
+For the Password Recovery  functionality, the corresponding code is placed in ForgotPassword.php, shown in \ref{listing:forgotPassword} . Before a new password for the user is generated, the entered email address is validated.  If a account with the email address is not existing, a JSON file is sent to the browser and its message is displayed via javascript. Else a new password is generated and sent via mail. A JSON File with a confirmation message is sent to the browser as well. 
+
+\begin{lstlisting}[caption= Validating Email before generating new Passowrd  line 54-59 ,label=listing:forgotPassword]
+$hash = new Hash();
+$user = new User();
+
+$user = $user->findByEmail($emailAddress);
+
+if( !$user->getId() ) {
+$parser->setStatusCode( STATUS_CODE_ERROR )
+->setStatusMessage( "Email address not found." )
+->parse();
+}
+
+$newPassword = $hash->createRandomString( 15 );
+$saltedPassword = $hash->saltPassword($newPassword, $user->getSalt());
+
+$user->setPassword($saltedPassword)->save();
+
+Mail::sendNewPassword($user, $newPassword);
+
+/***************************
+* 3. Parse Response
+**************************/
+
+$parser->setStatusCode( STATUS_CODE_SUCCESS )
+->setStatusMessage( "New password set" )
+->parse();
+\end{lstlisting}
+
+
+
+\subsection{Likelihood}
+It's very likely that attackers will use this vulnerability to guess some user accounts, since they receive a graphical feedback if the account exists.
+
+
+\subsection{Implication} 
+This vulnerability leads to a disclosure of user accounts. The impact of that depends on the actions which are possible with a valid user account. In our case there are no possible attacks without knowing the password for this account.
+
+
+\subsection{Recommendations}
+For the login screen  you could send an email to the user with a notification, that the account is blocked, to avoid this leakage of information. For the Password Recovery, you simply don't notify the user if an account if the email exists. 
+
+\subsection{Comparison with our App}
+Since there's no blocking mechanism for unsuccessful login attempts in our app, there also is no leakage of information. Therefore it's not possible to guess valid user accounts. When recovering the password, no information about non-existing/ existing accounts is leaking.
+
