@@ -1,0 +1,29 @@
+\chapter{Test for Process Timing (OTG-BUSLOGIC-004)}
+\subsection{Observation}
+	We observed that the process time of the password recovery service is leaking information about existing accounts.
+	If the user enters an email address of an existing account, an email with a new password is sent and therefore the processing time increases significantly.
+
+
+Likelihood: medium \newline
+
+Impact: low\newline
+
+Risk: medium\newline
+
+\subsection{Discovery}
+This vulnerability was found when testing the password recovery function, reachable at the login screen via the link " Forgot Password?".
+After we noticed the time difference between entering a valid email address and a invalid one, the used the safari developer tools to measure manually the response time of the request. After several request the average response time for an email address of an existing account is about 4 seconds. The  average response time for an email address of a non-existing account is about 40 ms. That's a huge difference that can be noticed by every attacker.
+
+
+
+\subsection{Likelihood}
+It's very likely that attackers will use this vulnerability to guess some user accounts, since the difference in response times is significant. Furthermore an attacker could try 1000 invalid email addresses in round about one minute. 
+
+\subsection{Implication} 
+This vulnerability leads to a disclosure of user accounts. The impact of that depends on the actions which are possible with a valid user account. In our case there are no possible attacks without knowing the password for this account.
+
+
+\subsection{Recommendations}
+To Avoid this kind of information leakage  there a few solution. First you could implement a time-out for the case that the user entered a invalid address, so that the process times equal. Second you could send a response without waiting the email to be sent.
+That could result in a worse user experience because he/she doesn't get a feedback. But in would solve the problem of information leakage.
+
