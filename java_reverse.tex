@@ -6,10 +6,66 @@ The Java-SCS program is responsible for generating TAN codes when the user chose
 
 After starting the SmartCardSimulator, the user can open his personal SmartCard file. To do that, he has to enter his PIN. The SmartCard file is protected (AES-128 encrypted) and can only be read properly if the correct PIN was entered. Unfortunately the SCS does not recognize if the PIN was correct or not. It just generates TANs with a wrong PIN, and the NEXT9Bank Website then tells you if the TAN was correct or not. Another problem is that the SmartCard file is updated/changed whenever a TAN was generated. Thus, if entering a wrong PIN, the SmartCard file is corrupted, and cannot be used for further generation of TANs. The user has to download the SmartCard file again from the Website.
 
-After opening a valid SmartCard file, the user can create TANs fro single transactions or batch file transactions. For single transactions he has to enter the account numbers of the sender and receiver account and an amount. Fir batch transactions he has to choose a batch file and to enter the sender's account number. Batch files are not validated by the SCS, the user can choose a random file and gets TANs generated for it.
+After opening a valid SmartCard file, the user can create TANs for single transactions or batch file transactions. For single transactions he has to enter the account numbers of the sender and receiver account and an amount. Fir batch transactions he has to choose a batch file and to enter the sender's account number. Batch files are not validated by the SCS, the user can choose a random file and gets TANs generated for it.
 
 \section{Discovery}
 
 The Java-SCS can be easily decompiled using \textit{jd-gui} can the \textit{eclipse} plugin of \textit{jd}. The resulting code looks pretty good, variable names are still the original ones, the strcuture of packages and classes has been kept and the code is easily understandable who has experience in Java development.
 
+There is only one UI class where the decompiler failed and just printed \textit{INTERNAL ERROR} instead of the actual code. Fortunately this class represents only the Dialog where the user enters his PIN, which is not very important for the overall work flow of the application.
+
 The UI is based on \textit{JavaFX} and the \textit{Google Core Libraries for Java 1.6+} (guava-libraries)\footnote{\url{https://code.google.com/p/guava-libraries/}} are also included as well as \textit{controlsfx}. For building maven was used.
+
+\section{Analysis of the decompiled Java Code}
+
+As already mentioned, the decompiled Code is in a very good shape, and should be very similar to what the developers actually wrote. Most of the code is responsible for the JavaFX UI and not very important for the generation of a TAN.
+
+The interesting code is located in the packages \textit{model} and \textit{helpers}. 
+
+\subsection{\textit{model} package}
+
+The \textit{model} package contains one Singleton class called \textit{Storage}. This class is solely responsible for reading and writing SmartCard files. It has a property \textit{seed} which is read from a SmartCard file and then later on used for generating TANs. After generating a TAN this \textit{seed} will be updated and the SmartCard file will be updated with the new \textit{seed}.
+
+\subsection{\textit{helpers} package}
+
+The \textit{helpers} package contains three classes, which are responsible for decrypting and encrypting SmartCard files as well as generating TANs.
+
+\subsubsection{\textit{MCrypt} class}
+
+This class uses the \textit{javax.crypto} package to to encrypt and decrypt arbitrary Strings with the AES in Cipher Block Chaining (CBC) mode. It has three helper methods, to pad Strings, to convert byte arrays to hex Strings and the other way round, to convert hex Strings in byte arrays.
+
+The class has a private member variable called \textit{iv} which represents the \textit{Initialization Vector}. The problem is that this vector should not be static. It should be randomly chosen at the beginning of each encryption session. In this case it is always \textit{fedcba9876543210}.
+
+\subsubsection{\textit{Encryption} class}
+
+The \textit{Encryption} class is an abstraction of the \textit{MCrypt} class and offers simpler encryption and decryption functionality. It offers methods for encryption and decryption a String with a certain password. The password is the six digit PIN of the user, padded with ten zeros at the end. The padding is needed because the key for the AES encryption has to have a certain size. But by padding zeros at the end of the PIN a lot of entropy is taken out of the key and it is less secure.
+
+\subsubsection{\textit{TanCreator} class}
+
+This class is responsible for generating the TANs. It has two methods for generating TANs, one for single transactions and one for batch transactions. It contains also a method \textit{getNextSeed} which is returns an updated \textit{seed} that is written to the SmartCard file if a TAN was generated.
+
+The generation is based on a \textit{sha-512} hash algorithm. For a single transaction the current seed,  the receiver's account number, the amount and the sender's account number are concatenated and then hashed. For a batch transaction it is the current seed, the sender's account number and the \textit{md5} of the batch file. The \textit{sha-512} hash is way too long for a TAN, so it is truncated by the following method:
+
+\begin{lstlisting}[caption=getTanFromHash method]
+private static String getTanFromHash(String hash)
+{
+	hash = hash.substring(0, 6);
+	int hashInt = Integer.parseInt(hash, 16);
+	hash = String.valueOf(hashInt).substring(0, 6);
+	return hash;
+}
+\end{lstlisting}
+
+The method above takes the \textit{sha-512} hash, takes the forst six elements of it and converts it to an integer. That means hex values like a, are converted to 10 for example. After that this integer is converted to a String and the first six elements of that String represent the TAN.
+
+There is a bug in this method. Let us assume that the hash given is starts with '\textit{000123}'. Then the resulting integer value \textit{hashInt} is \textit{123}. That means this number is too short because a TAN normally consists of six digits. An \textit{StringIndexOutOfBounds} Exception will be raised when trying to get the \textit{substring(0, 6)} from \textit{123}.
+
+\section{Conclusion}
+
+When the user wants to generate a TAN, he uses his personal SmartCard file, which contains a so called \textit{seed}. This seed is the shared information of the server and the client needed to generate a TAN. The SmartCard file containing the seed is encrypted with the user's PIN.
+
+The \textit{seed} is used by the algorithm which generates new TANs. After a generation, the \textit{seed} in the SmartCard file has to be updated properly and written to the SmartCard file.
+
+Using this approach, the \textit{seed} at the server side and the client side has always to be in sync. At the server side ten generated TANs, are accepted\footnote{include/Validate.php line 210}. Otherwise, if the user would generate a TAN which he does not use, the generation would always generate invalid TANs.
+
+The only problem that remains, is if the user has a typo in his PIN, the hole SmartCard file will be corrupt, as already described above.
