@@ -1,0 +1,31 @@
+\chapter{Tested Vulnerabilities}
+\section{Test Application Platform Configuration (OTG-CONFIG-002)}
+We only run the services required by our application to reduce attack surface.
+\section{Test File Extensions Handling for Sensitive Information (OTG-CONFIG-003)}
+We made sure that we do not serve any plain text files with sensitive information from our web root directory.
+\section{Enumerate Infrastructure and Application Admin Interfaces (OTG-CONFIG-005)}
+Our application admin interfaces are locked via session checking.
+\section{Test Role Definitions (OTG-IDENT-001)}
+Our application features two role definitions, which are the customer role and the employee role.
+We clearly defined permissions for each of the two roles. These permissions are enforced by our session management for each web page.
+\section{Test User Registration Process (OTG-IDENT-002)}
+Our registration process allows registration of any user with a valid email address. All registration applications are checked and verified by one of our employees before the account is activated. Therefore automated registrations are possible to be monitored by the system.
+
+\section{Test Account Provisioning Process (OTG-IDENT-003)}
+All users applications are verified by one of our employees. All employee applications must be verified by one of our existing employees.
+
+\section{Testing for Account Enumeration and Guessable User Account (OTG-IDENT-004)}
+The app doesn't leak any information about existing user accounts. 
+In the login screen there's no difference between entering an existing email address and a non-existing one.
+At the password recovery service, it's the same. So it's not possible to guess existing user accounts.
+
+\section{Testing for Weak or unenforced username policy (OTG-IDENT-005)}
+Instead of possibly insecure, guessable user names, we are using the email address as the main identifier for our customers. As described in OTG-IDENT-004, our application does not leak any information about existing accounts.
+
+\section{Testing for Credentials Transported over an Encrypted Channel (OTG-AUTHN-001)}
+All communication between clients and our application is done via HTTPS. To enforce this policy we redirect any HTTP request to HTTPS. Therefore no credentials are transmitted in plain text.
+
+\section{Testing for default credentials (OTG-AUTHN-002)}
+We don not use any default credentials in our app. 
+
+
