@@ -66,6 +66,10 @@ When the user wants to generate a TAN, he uses his personal SmartCard file, whic
 
 The \textit{seed} is used by the algorithm which generates new TANs. After a generation, the \textit{seed} in the SmartCard file has to be updated properly and written to the SmartCard file.
 
-Using this approach, the \textit{seed} at the server side and the client side has always to be in sync. At the server side ten generated TANs, are accepted\footnote{include/Validate.php line 210}. Otherwise, if the user would generate a TAN which he does not use, the generation would always generate invalid TANs.
+Using this approach, the \textit{seed} at the server side and the client side has always to be in sync. At the server side ten generated TANs, are accepted\footnote{include/Validate.php, line 210}. Otherwise, if the user would generate a TAN which he does not use, the generation would always generate invalid TANs.
 
 The only problem that remains, is if the user has a typo in his PIN, the hole SmartCard file will be corrupt, as already described above.
+
+\section{Recommendation}
+
+Besides the recommendations in chapter \ref{chapter:static_iv} and \ref{chapter:weak_key}, where problems of the static IV and the weak AES key are described, it would be advisable to obfuscate the Java byte code (e.g. with ProGuard\footnote{url{http://proguard.sourceforge.net}}). This makes the decompiled Java Code more complex and a lot harder to understand, which will bother an attacker a lot more.
