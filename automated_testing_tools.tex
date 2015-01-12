@@ -1,6 +1,6 @@
-\section{Testing PHP Code for Vulnerabilities}
+\chapter{Testing PHP and JavaScript Code with automated Tools}
 
-\subsection{Testing Efforts}
+\section{Testing PHP Code}
 
 First of all, the php code is very structured and readable. Although that makes it easy to understand what the code is doing, we couldn't find big vulnerabilities in the php code.
 We used  the two automated tools RATS and RIP for testing the PHP code. While Rats doesn't find any vulnerabilities at all, RIPS is claiming some including errors, shown in Listing .
@@ -16,11 +16,10 @@ Include error: tried to include: /Phase4/secure-coding/backend/rest/include/libp
 \end{lstlisting}
 This errors are not leading to vulnerabilities. The reason for the lack of found vulnerabilities besides the quality of the code, is the fact, that it's object oriented. Both tools are clearly stating that they don't support object oriented php code yet. So these results are no big surprise.
 
-\subsection{Testing for most common vulnerabilities}
- In this passage, we will describe why the application is not vulnerable to some of the most known attacks.
- \newline
- First of all, the ap is not vulnerable to SQL-Injections. The reason is the usage of the php library sqli, which creates query objects instead of directly using strings as queries.
- Another important reason is that, the app is consistent in this behaviour. All database request are delegated to the class DBModel.php in backend/resr/include. So there's no chance of finding vulnerable database requests.
- \newline
- 
+\section{Testing JavaScript Code}
+Since the application uses  the AngularJS framework to enhance html, we decided to test the javascript code in terms of security. Therefore we used two Testing Tools: JSPrime and ScanJS
+
+
+
+
  
