@@ -1,0 +1,15 @@
+\section{Testing for weak password change or reset functionalities (OTH-AUTHN-009)}
+\subsection{Observation}
+The password reset mechanism of our application is not optimal, since the new password is generated on the server side and sent to the user via email. Sending confidential data via email is not sufficiently secure for a banking application.
+
+Likelihood: low \newline
+
+Impact: high\newline
+
+Risk: medium\newline
+\subsection{Discovery}
+This vulnerability was discovered during testing of the password change functionality.
+\subsection{Implications}
+If an attacker has access to the users email account or is able to intercept the users emails in unencrypted form, he can obtain the newly generated password. This could compromise the users bank account. 
+\subsection{Recommendation}
+We recommend, that the reset functionality is changed, such that passwords are no longer sent via email. One option would be to send the passwords via traditional mail. Another option would be to ask for the answer to an additional security question. If the correct answer is provided the user may change their password via a HTTPS secured page.

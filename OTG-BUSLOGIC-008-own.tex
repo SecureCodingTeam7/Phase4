@@ -1,0 +1,15 @@
+\section{Test Upload of Unexpected File Types (OTG-BUSLOGIC-008) and Test Upload of Malicious Files (OTG-BUSLOGIC-009)}
+\subsection{Observation}
+Currently the user can upload any file type when uploading batch files.
+
+Likelihood: high \newline
+
+Impact: low\newline
+
+Risk: low\newline
+\subsection{Discovery}
+This vulnerability was discovered by trying to upload arbitrary files as a batch file.
+\subsection{Implications}
+An attacker can upload any file he wants, it is then saved in the \textit{/tmp} directory with a random name. The batch file parser fails parsing invalid files, and returns with an error. After that the file is removed. That means, unless the attacker has direct access and can for example copy the file, there should be no harm.
+\subsection{Recommendation}
+Only allow the upload of \textit{.txt} files.

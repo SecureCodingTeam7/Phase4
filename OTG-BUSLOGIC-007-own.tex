@@ -1,0 +1,15 @@
+\section{Test defenses against application mis-use (OTG-BUSLOGIC-007)}
+\subsection{Observation}
+In the current application there are no mechanisms implemented to detect intrusion or other attacks. There is also no event logging, except for the standard Apache log files.
+
+Likelihood: high \newline
+
+Impact: low\newline
+
+Risk: medium\newline
+\subsection{Discovery}
+This vulnerability was discovered while reading the OWASP testing guide.
+\subsection{Implications}
+If an attacker tries to misuse the system there is no way to recognize these ``unpleasant actions''.
+\subsection{Recommendation}
+Implement basic event logging and maybe intrusion detection.

@@ -1,0 +1,15 @@
+\section{Testing for Weak lock out mechanism (OTG-AUTHN-003)}
+\subsection{Observation}
+Our app doesn't use any lock out mechanism for the login process. 
+
+Likelihood: high \newline
+
+Impact: medium\newline
+
+Risk: medium\newline
+\subsection{Discovery}
+This vulnerability was immediately found after completion of the login process.
+\subsection{Implications}
+An Attacker can run brute force attacks against our application in order to guess user credentials.
+\subsection{Recommendation}
+We recommend the implementation for the login page. Reactivation of an account should be done by a trusted employee.

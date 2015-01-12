@@ -26,6 +26,58 @@ Instead of possibly insecure, guessable user names, we are using the email addre
 All communication between clients and our application is done via HTTPS. To enforce this policy we redirect any HTTP request to HTTPS. Therefore no credentials are transmitted in plain text.
 
 \section{Testing for default credentials (OTG-AUTHN-002)}
-We don not use any default credentials in our app. 
+We do not use any default credentials in our app. 
 
+\section{Testing for Bypassing Authentication Schema (OTG-AUTHN-004)}
+The session management of our application enforces the authentication schema and role permissions on each web page.
+ 
+\section{Testing for Vulnerable Remember Password (OTG-AUTHN-005)}
+All passwords are salted and then stored in hashed from using the sha-256 algorithm. Additionally we do not store any sensitive information in cookies except for the session id.
 
+\section{Testing for Browser cache weakness (OTG-AUTHN-006)}
+This vulnerability is avoided by using HTTPS.
+
+\section{Testing for Weak password policy (OTG-AUTHN-007)}
+Our password policy provides sufficient security regarding password strength. All password must contain at least one upper case letter, one lower case letter and one number. The password must be at least 8 characters long.
+
+\section{Testing Directory traversal/file include (OTG-AUTHZ-001)}
+The apache web server on our VM is configured to not allow directory listing and traversal. Furthermore we configured read/write/execute permissions for the apache user as strictly as possible. Therefore it should not be possible to access directories outside of what is allowed by the permissions.
+
+\section{Testing for Bypassing Authorization Schema (OTG-AUTHZ-002)}
+This vulnerability is not relevant because of our session management as mentioned previously in OTG-AUTHN-004.
+
+\section{Testing for Privilege escalation (OTG-AUTHZ-003)}
+The session managements controls the permissions of each user based on the role definitions. Therefore the users can not commit actions outside of their assigned role. Users are also not allowed to change their role and to our knowledge there exists no vulnerability that would allow this behaviour. 
+
+\section{Testing for Session Fixation (OTG-SESS-003)}
+Our session ids are regenerated for each login process, which avoids this vulnerability.
+
+\section{Testing for Exposed Session Variables (OTG-SESS-004)}
+The session id is the only critical information stored in our cookie. It is regenerated for each login and during transit it is encrypted via HTTPS.
+
+\section{Testing for logout functionality (OTG-SESS-006)}
+Our application provides a manual log out functionality which destroys the session and all data associated with it. We use the default session time out mechanism provided by php.
+
+\section{Testing for Session puzzling (OTG-SESS-008)}
+In our application the session is only started at the login and destroy at the logout. There are no other entry points which could be used to overload sessions.
+
+\section{Testing for Buffer Overflow (OTG-INPVAL-014)}
+To our knowledge there exist no possibilities for heap or stack overflows, since we tried to avoid allocating space on the heap and used secure functions for copying buffers. However we could improve on security by adding the compiler flag \textit{-fPIE} in gcc to randomize address locations, making it harder for an attacker to cause buffer overflows.
+
+\section{Testing for Weak SSL/TLS Ciphers, Insufficient Transport Layer Protection (OTG-CRYPST-001)}
+We assume that the SSL/TLS implementation of the Apache web server used for HTTPS, is secure.
+
+\section{Testing for Sensitive information sent via unencrypted channels (OTG-CRYPST-003)}
+All traffic of our web application is encrypted by HTTPS. There are no items that can be accessed without using HTTPS.
+
+\section{Test business logic data validation (OTG-BUSLOGIC-001)}
+We endeavoured to validate all data at the frontend and at the backend side. Further validation is done by third party libraries like PDO.
+
+\section{Testing for the Circumvention of Work Flows (OTG-BUSLOGIC-006)}
+We tried to keep the work flows in our web application simple. To our knowledge there is no way to circumvent steps within the work flow.
+
+\section{Testing for Client Side URL Redirect (OTG-CLIENT-004)}
+In our web application there is no redirect functionality, where an attacker could inject his own URL.
+
+\section{Testing for CSS Injection (OTG-CLIENT-005)}
+Our web application does not support supplying custom CSS. All CSS we used is statically defined.
