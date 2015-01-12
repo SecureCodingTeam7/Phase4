@@ -34,11 +34,11 @@ The \textit{helpers} package contains three classes, which are responsible for d
 
 This class uses the \textit{javax.crypto} package to to encrypt and decrypt arbitrary Strings with the AES in Cipher Block Chaining (CBC) mode. It has three helper methods, to pad Strings, to convert byte arrays to hex Strings and the other way round, to convert hex Strings in byte arrays.
 
-The class has a private member variable called \textit{iv} which represents the \textit{Initialization Vector}. The problem is that this vector should not be static. It should be randomly chosen at the beginning of each encryption session. In this case it is always \textit{fedcba9876543210}.
+The class has a private member variable called \textit{iv} which represents the \textit{Initialization Vector}. The problem is that this vector should not be static. It should be randomly chosen at the beginning of each encryption session. In this case it is always \textit{fedcba9876543210}. More information on this is described in chapter \ref{chapter:static_iv}.
 
 \subsubsection{\textit{Encryption} class}
 
-The \textit{Encryption} class is an abstraction of the \textit{MCrypt} class and offers simpler encryption and decryption functionality. It offers methods for encryption and decryption a String with a certain password. The password is the six digit PIN of the user, padded with ten zeros at the end. The padding is needed because the key for the AES encryption has to have a certain size. But by padding zeros at the end of the PIN a lot of entropy is taken out of the key and it is less secure.
+The \textit{Encryption} class is an abstraction of the \textit{MCrypt} class and offers simpler encryption and decryption functionality. It offers methods for encryption and decryption a String with a certain password. The password is the six digit PIN of the user, padded with ten zeros at the end. The padding is needed because the key for the AES encryption has to have a certain size. But by padding zeros at the end of the PIN a lot of entropy is taken out of the key and it is less secure. More information on this is described in chapter \ref{chapter:weak_key}.
 
 \subsubsection{\textit{TanCreator} class}
 
