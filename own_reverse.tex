@@ -1,0 +1,31 @@
+\chapter{Reverse Engineering}
+
+\section{Java-SCS}
+
+\subsection{General}
+
+The decompiler \textit{jd-gui} is able to decompile our SCS software, too. The decompiled code is very similar to what the actual source code looks like. 
+
+\subsection{Recommendations}
+
+In this case it is also advisable to obfuscate the program, to make it harder for an attacker what is going on. 
+
+\section{C-Parser}
+
+\subsection{General}
+
+The disassembly of the parser executable is much more complex then the one of team 8. This is because, it contains much more logic, to validate the input and to store the input accordingly in the database. It also contains code to calculate an md5 hash and to contact a network time server.
+
+The user name and the password of the database are located as strings in the executable file and can thus be easily extracted. But this does not represent any problem, because the parser executable should not be publicly available.
+
+The disassembly also contains further debugging information because the parser was compiled in debugging mode without any optimization instead of in release mode.
+
+Regarding buffer overflows, the parser is, in our opinion very resistant, because we avoided using unsafe functions to copy data between buffers. We always used functions which take a maximum size of bytes to copy (functions with an \textit{n} in the name, like \textit{strncpy} or \textit{strncat})
+
+For storing information in the database we used throughout the hole program prepared statements offered by the mysql C API, to avoid SQL Injection.
+
+\subsection{Recommendations}
+
+For productive use the C-Code should always be compiled in release mode and not in debug mode, to truncate any debug information which could be useful for an attacker.
+
+To get further stack protection the parser should also be compiled with the \textit{-fstack-protector(-all)} of the gcc, just like team 8 did it. 
