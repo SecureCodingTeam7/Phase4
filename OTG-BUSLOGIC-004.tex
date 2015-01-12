@@ -1,7 +1,7 @@
 \chapter{Test for Process Timing (OTG-BUSLOGIC-004)}
 \section{Observation}
 	We observed that the process time of the password recovery service is leaking information about existing accounts.
-	If the user enters an email address of an existing account, an email with a new password is sent and therefore the processing time increases significantly.
+	If the user enters an email address of an existing account, an email with a new password is sent and therefore the processing time increases significantly.\\
 
 
 Likelihood: medium \newline
@@ -33,6 +33,4 @@ This vulnerability leads to a disclosure of user accounts. The impact of that de
 To Avoid this kind of information leakage you there a few solution. First you could implement a time-out for the case that the user entered a invalid address, so that the process times equal. Second you could send a response without waiting the email to be sent.
 That could result in a worse user experience because he/she doesn't get a feedback. But in would solve the problem of information leakage.
 
-\section{Comparison with our App}
-Since our webapp is not based on a rest service, it's not that easy to test the response times in a automated way like described above. But you can measure the response times manually, e.g. with the Safari developer tools. Therefore you can see that there's only a processing time difference about three seconds. Therefore our app has the same vulnerability.
 

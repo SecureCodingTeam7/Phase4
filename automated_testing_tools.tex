@@ -14,10 +14,10 @@ Include error: tried to include: /Phase4/secure-coding/backend/rest/include/libp
 Include error: tried to include: /Phase4/secure-coding/backend/rest/include/libphp-phpmailer/class.phpmailer.php
 11: require require ("libphp-phpmailer/class.phpmailer.php"); 
 \end{lstlisting}
-This errors are not leading to vulnerabilities. The reason for the lack of found vulnerabilities besides the quality of the code, is the fact, that it's object oriented. Both tools are clearly stating that they don't support object oriented php code yet. So these results are no big surprise.
+These errors are not leading to vulnerabilities. The reason for the lack of found vulnerabilities besides the quality of the code, is the fact, that it's object oriented. Both tools are clearly stating that they don't support object oriented php code yet. So these results are no big surprise.
 
 \section{Testing JavaScript Code}
-Since the application uses  the AngularJS framework to enhance html, we decided to test the javascript code in terms of security. Therefore we used two Testing Tools: JSPrime and ScanJS. Both tools doesn't return any input at all. That's because they  apparently can't handle the AngularJS specific design.  
+Since the application uses  the AngularJS framework to enhance html, we decided to test the javascript code in terms of security. Therefore we used two Testing Tools: JSPrime and ScanJS. Both tools doesn't return any output at all. That's because they apparently can't handle the AngularJS specific code design. Furthermore we couldn't any other AngularJS specific vulnerable which are known for current versions.
 
 
 

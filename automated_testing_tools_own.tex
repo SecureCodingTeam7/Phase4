@@ -1,0 +1,18 @@
+\chapter{Testing PHP with automated Tools}
+
+\section{Testing PHP Code}
+Like mentioned previously the automated testing tools RATS and RIPS doesn't support object-oriented PHP code. Therefore they do not return any valuable output.
+While RIPS does not return any output, RATS claims some vulnerabilities in third party libraries, like PHPMailer and FDPI, shown in Listing \ref{listing:rats}.
+All this vulnerabilities are basing on the fact that the libraries do not valid there input. 
+We not further tested this vulnerabilities because we sanitize all of our data which is delegated to these libraries like an email address.
+
+\begin{lstlisting}[caption = Output of tool RATS claiming vulnerabilities of PHPMailer library,label = listing:rats]
+/var/www/Phase3/phase3//include/phpmailer/class.smtp.php:660: High: mail
+Arguments 1, 2, 4 and 5 of this function may be passed to an external 
+program. (Usually sendmail). Under Windows, they will be passed to a
+remote email server. If these values are derived from user input, make
+sure they are properly formatted and contain no unexpected characters or
+extra data.
+\end{lstlisting}
+
+  
