@@ -1,5 +1,5 @@
 \chapter{Test for Process Timing (OTG-BUSLOGIC-004)}
-\subsection{Observation}
+\section{Observation}
 	We observed that the process time of the password recovery service is leaking information about existing accounts.
 	If the user enters an email address of an existing account, an email with a new password is sent and therefore the processing time increases significantly.
 
@@ -10,7 +10,7 @@ Impact: low\newline
 
 Risk: medium\newline
 
-\subsection{Discovery}
+\section{Discovery}
 This vulnerability was found when testing the password recovery function, reachable at the login screen via the link " Forgot Password?".
 After we noticed the time difference between entering a valid email address and a invalid one, we calculated the average response time of an valid and an invalid email address with a PHP Script (Appendix \ref{appendix:average}), which sends  100 POST requests with each a valid and an invalid email address to the corresponding REST Service and records the response times. The results are shown in Listing \ref{listing:response_time_test}.
 
@@ -22,17 +22,17 @@ Average Response Time for invalid address: 0.06285205
 
 Due to the significant difference, we wrote another script (Appendix \ref{appendix:validate_via_time}) which take a list of email addresses and returns the valid ones by comparing the response time with a threshold, which can be provided by the user as well. We chose two seconds for the threshold, because of the results shown above. All Tests resulted in a 100\% success rate. Of course this can differ under certain circumstances( e.g. heavy traffic load). 
 
-\subsection{Likelihood}
+\section{Likelihood}
 It's very likely that attackers will use this vulnerability to guess some user accounts, since the difference in response times is significant. Furthermore an attacker could try 1000 invalid email addresses in round about one minute. 
 
-\subsection{Implication} 
+\section{Implication} 
 This vulnerability leads to a disclosure of user accounts. The impact of that depends on the actions which are possible with a valid user account. In our case there are no possible attacks without knowing the password for this account.
 
 
-\subsection{Recommendations}
+\section{Recommendations}
 To Avoid this kind of information leakage you there a few solution. First you could implement a time-out for the case that the user entered a invalid address, so that the process times equal. Second you could send a response without waiting the email to be sent.
 That could result in a worse user experience because he/she doesn't get a feedback. But in would solve the problem of information leakage.
 
-\subsection{Comparison with our App}
+\section{Comparison with our App}
 Since our webapp is not based on a rest service, it's not that easy to test the response times in a automated way like described above. But you can measure the response times manually, e.g. with the Safari developer tools. Therefore you can see that there's only a processing time difference about three seconds. Therefore our app has the same vulnerability.
 
