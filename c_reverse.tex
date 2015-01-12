@@ -30,7 +30,7 @@ To reverse engineer the code of the parser we used different versions of IDA (Pr
 
 After that we tried to write some C Code to imitate the parser. Therefore we began writing simple code for opening and reading the file, then we compiled it and disassembled it with IDA and compared the original disassembly of the actual parser and our clone. As soon as we were satisfied with the result, we continued with the other parts of the parser.
 
-During this process we recognized that the original parser was compiled with the \textit{gcc} option \textit{fstack-protector(-all)}. This activates protection of the stack against stack smashing with the help of canary values. This makes it more difficult for an attacker to exploit buffer overflows.
+During this process we recognized that the original parser was compiled with the \textit{gcc} option \textit{-fstack-protector(-all)}. This activates protection of the stack against stack smashing with the help of canary values. This makes it more difficult for an attacker to exploit buffer overflows.
 
 \section{Analysis of the Reverse Engineered Code}
 
