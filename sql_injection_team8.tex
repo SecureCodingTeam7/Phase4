@@ -1,0 +1,6 @@
+\chapter{Testing for SQL Injection ()OTG-INPVAL-005)}
+
+\section{Observation}
+
+The app is not vulnerable to sql injections.  The reason is the usage of the php library sqli, which creates query objects instead of directly using strings as queries.
+ Another important reason is that, the app is consistent in its behaviour. All database request are delegated to the class DBModel.php in backend/resr/include. So there's no chance of finding vulnerable database requests.
