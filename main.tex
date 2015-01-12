@@ -38,7 +38,22 @@
 \maketitle
 
 \part{Executive Summary}
-TODO
+
+This report states our findings in the white-box test of the NEXT9Bank web application from Team 8. We analyzed the PHP and JavaScript Code of the backend and the frontend web application. We also reverse engineered the code of the batch file parser written in C and the Java-SCS. After that we also analyzed and reverse engineered our own applications.
+
+\subsubsection{Analysis}
+
+The white-box analysis of the PHP and the JavaScript Code and our own PHP did not show a lot results. Most white-box analysis tools have problems with the object oriented PHP code and the AngularJS JavaScript code team 8 used within their whole application. There were not any usable results, mostly false positives.
+
+By looking through the decompiled Java and PHP code, we found some weaknesses regarding the SmartCard files. These weaknesses are not really dangerous vulnerabilities, we could not gain any advantages from these. But nevertheless they should be eradicated.
+
+For the analysis we stuck to the OWASP testing guide, and found some vulnerabilities in our as well as the NEXT9Bank web application, which are not absolutely related to white-box testing.
+
+\subsubsection{Reverse Engineering}
+
+The reverse engineering of the Java program was pretty simple in our as well as the application of team 8. Both teams did not use any obfuscation tools, hence the decompiled source code was very well understandable, and should be pretty similar to what the actual Java looks like.
+
+The disassembly of the parser executable was a lot of more complex and harder to understand. The C parser from team 8 is pretty lightweight and was kept very simple. Therefore we managed it to write C code which does exactly the same as the parser provided by team 8. Our C parser is a lot more complex, because it validates the input and stores the information in the database.
 
 
 \tableofcontents
