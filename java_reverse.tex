@@ -73,3 +73,5 @@ The only problem that remains, is if the user has a typo in his PIN, the hole Sm
 \section{Recommendation}
 
 Besides the recommendations in chapter \ref{chapter:static_iv} and \ref{chapter:weak_key}, where problems of the static IV and the weak AES key are described, it would be advisable to obfuscate the Java byte code (e.g. with ProGuard\footnote{url{http://proguard.sourceforge.net}}). This makes the decompiled Java Code more complex and a lot harder to understand, which will bother an attacker a lot more.
+
+Besides that, there is not a lot more which can be done. The generation algorithm can be publicly known, because it depends on a secret key, the PIN, which is only known by the user. Thus, an attacker can not really do something only with the algorithm!
