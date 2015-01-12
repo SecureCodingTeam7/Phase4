@@ -4,10 +4,12 @@
 \usepackage{color}
 \usepackage{multirow}
 \usepackage{graphicx}
+\usepackage{titletoc}
 
 \definecolor{dkgreen}{rgb}{0,0.6,0}
 \definecolor{gray}{rgb}{0.5,0.5,0.5}
 \definecolor{pink}{rgb}{1,0.07,0.57}
+
 
 \lstset{frame=tb,
   language=Java,
@@ -65,6 +67,7 @@ The disassembly of the parser executable was a lot of more complex and harder to
 \include{most_important_observations}
 
 \part{Vulnerabilities}
+\include{automated_testing_tools}
 \include{OTG-IDENT-004}
 \include{OTG-BUSLOGIC-004}
 \include{elias}
@@ -72,6 +75,14 @@ The disassembly of the parser executable was a lot of more complex and harder to
 \part{Reverse Engineering}
 \include{c_reverse}
 \include{java_reverse}
+
+\part{Own Application}
+\include{tested_vuln_own}
+\chapter{Found Vulnerabilities}
+\include{otg-auth-003-own}
+\include{OTG-AUTH-006-own}
+\include{OTG-BUSLOGIC-007-own}
+\include{OTG-BUSLOGIC-008-own}
 
 \part*{Appendix}
 \addcontentsline{toc}{part}{Appendix}
