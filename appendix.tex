@@ -136,3 +136,853 @@ return false;
 
 ?>
 \end{lstlisting}
+
+\chapter{Decompiled Java-SCS of NEXT9Bank}
+
+These are the classes of the package \textit{de.next9bank.scs}. The source code of third party libraries has been omitted.
+
+
+\section{Package \textit{gui.controllers}}
+
+\subsection{CreateTanController}
+
+\begin{lstlisting}
+/*     */ package de.next9bank.scs.gui.controllers;
+/*     */ 
+/*     */ import de.next9bank.scs.gui.GuiError;
+/*     */ import de.next9bank.scs.gui.GuiShowTan;
+/*     */ import de.next9bank.scs.helpers.TanCreator;
+/*     */ import de.next9bank.scs.model.Storage;
+/*     */ import java.io.File;
+/*     */ import javafx.fxml.FXML;
+/*     */ import javafx.scene.Scene;
+/*     */ import javafx.scene.control.Button;
+/*     */ import javafx.scene.control.TextField;
+/*     */ import javafx.scene.image.ImageView;
+/*     */ import javafx.scene.input.Clipboard;
+/*     */ import javafx.scene.input.ClipboardContent;
+/*     */ import javafx.stage.FileChooser;
+/*     */ 
+/*     */ public class CreateTanController
+/*     */ {
+/*  19 */   Storage s = Storage.getStorage();
+/*     */ 
+/*     */   @FXML
+/*     */   TextField senderInput;
+/*     */ 
+/*     */   @FXML
+/*     */   TextField receiverInput;
+/*     */ 
+/*     */   @FXML
+/*     */   TextField amountInput;
+/*     */ 
+/*     */   @FXML
+/*     */   Button loadBatchFile;
+/*     */ 
+/*     */   @FXML
+/*     */   Button createBatchTransactionTanButton;
+/*     */ 
+/*     */   @FXML
+/*     */   ImageView imgChecked;
+/*     */ 
+/*     */   @FXML
+/*     */   TextField senderInputBatch;
+/*  39 */   private FileChooser batchFileChooser = new FileChooser();
+/*     */   private File batchFile;
+/*     */ 
+/*  47 */   public void createSingleTransactionTan() { if ((!checkIfPositiveInteger(this.senderInput.getText())) || 
+/*  48 */       (!checkIfPositiveInteger(this.receiverInput
+/*  48 */       .getText())) || 
+/*  49 */       (!checkIfPositiveDouble(this.amountInput
+/*  49 */       .getText()))) {
+/*  50 */       GuiError ge = new GuiError("scs.gui.error.numberMustBePositive");
+/*  51 */       return;
+/*     */     }
+/*     */ 
+/*  54 */     String tan = TanCreator.createSingleTan(this.senderInput.getText(), this.receiverInput
+/*  55 */       .getText(), this.amountInput.getText());
+/*     */ 
+/*  57 */     Clipboard clipboard = Clipboard.getSystemClipboard();
+/*  58 */     ClipboardContent content = new ClipboardContent();
+/*  59 */     content.putString(tan);
+/*  60 */     clipboard.setContent(content);
+/*     */ 
+/*  62 */     GuiShowTan t = new GuiShowTan(tan);
+/*  63 */     t.showTan();
+/*     */ 
+/*  65 */     this.s.setLastTan(tan);
+/*  66 */     String newSeed = TanCreator.getNextSeed();
+/*  67 */     this.s.writeNewSeed(newSeed); }
+/*     */ 
+/*     */   public void loadBatchFile()
+/*     */   {
+/*  71 */     this.batchFile = this.batchFileChooser.showOpenDialog(this.loadBatchFile.getScene()
+/*  72 */       .getWindow());
+/*  73 */     if (this.batchFile != null)
+/*  74 */       this.imgChecked.setVisible(true);
+/*     */     else
+/*  76 */       this.imgChecked.setVisible(false);
+/*     */   }
+/*     */ 
+/*     */   public void createBatchTransactionTan()
+/*     */   {
+/*     */     GuiError e;
+/*  81 */     if (this.batchFile == null) {
+/*  82 */       e = new GuiError("scs.gui.error.noBatchFile");
+/*     */     }
+/*     */     else {
+/*  85 */       if (!checkIfPositiveInteger(this.senderInputBatch.getText())) {
+/*  86 */         GuiError ge = new GuiError("scs.gui.error.numberMustBePositive");
+/*  87 */         return;
+/*     */       }
+/*     */ 
+/*  90 */       String tan = TanCreator.createBatchTan(this.senderInputBatch.getText(), this.batchFile);
+/*     */ 
+/*  93 */       Clipboard clipboard = Clipboard.getSystemClipboard();
+/*  94 */       ClipboardContent content = new ClipboardContent();
+/*  95 */       content.putString(tan);
+/*  96 */       clipboard.setContent(content);
+/*     */ 
+/*  98 */       GuiShowTan t = new GuiShowTan(tan);
+/*  99 */       t.showTan();
+/*     */ 
+/* 101 */       this.s.setLastTan(tan);
+/* 102 */       String newSeed = TanCreator.getNextSeed();
+/* 103 */       this.s.writeNewSeed(newSeed);
+/*     */     }
+/*     */   }
+/*     */ 
+/*     */   public boolean checkIfPositiveInteger(String input) {
+/*     */     try {
+/* 109 */       int i = Integer.parseInt(input);
+/* 110 */       if (i <= 0) {
+/* 111 */         throw new Exception();
+/*     */       }
+/* 113 */       return true; } catch (Exception e) {
+/*     */     }
+/* 115 */     return false;
+/*     */   }
+/*     */ 
+/*     */   public boolean checkIfPositiveDouble(String input)
+/*     */   {
+/*     */     try
+/*     */     {
+/* 122 */       double i = Double.parseDouble(input);
+/* 123 */       if (i <= 0.0D) {
+/* 124 */         throw new Exception();
+/*     */       }
+/* 126 */       return true; } catch (Exception e) {
+/*     */     }
+/* 128 */     return false;
+/*     */   }
+/*     */ }
+
+/* Location:           /Volumes/MacintoshHD/Users/mep/Downloads/smartcard_reader_application.jar
+ * Qualified Name:     de.next9bank.scs.gui.controllers.CreateTanController
+ * JD-Core Version:    0.6.2
+ */
+\end{lstlisting}
+
+\subsection{MainController}
+
+\begin{lstlisting}
+package de.next9bank.scs.gui.controllers;
+
+public class MainController
+{
+}
+
+/* Location:           /Volumes/MacintoshHD/Users/mep/Downloads/smartcard_reader_application.jar
+ * Qualified Name:     de.next9bank.scs.gui.controllers.MainController
+ * JD-Core Version:    0.6.2
+ */
+\end{lstlisting}
+
+\subsection{MenuController}
+
+\begin{lstlisting}
+/*     */ package de.next9bank.scs.gui.controllers;
+/*     */ 
+/*     */ import de.next9bank.scs.gui.GuiError;
+/*     */ import de.next9bank.scs.model.Storage;
+/*     */ import java.io.File;
+/*     */ import java.io.IOException;
+/*     */ import java.util.ResourceBundle;
+/*     */ import javafx.application.Platform;
+/*     */ import javafx.fxml.FXML;
+/*     */ import javafx.fxml.FXMLLoader;
+/*     */ import javafx.scene.Node;
+/*     */ import javafx.scene.Scene;
+/*     */ import javafx.scene.control.Menu;
+/*     */ import javafx.scene.control.MenuBar;
+/*     */ import javafx.scene.layout.BorderPane;
+/*     */ import javafx.scene.layout.Pane;
+/*     */ import javafx.stage.FileChooser;
+/*     */ import javafx.stage.Stage;
+/*     */ import javafx.stage.StageStyle;
+/*     */ 
+/*     */ public class MenuController
+/*     */ {
+/*     */ 
+/*     */   @FXML
+/*     */   private MenuBar menuBar;
+/*     */ 
+/*     */   @FXML
+/*     */   private Menu file;
+/*     */   Storage s;
+/*  33 */   private FileChooser smartCardFileChooser = new FileChooser();
+/*     */ 
+/*     */   public MenuController() {
+/*  36 */     this.s = Storage.getStorage();
+/*     */   }
+/*     */ 
+/*     */   public void loadSmartCard()
+/*     */   {
+/*  44 */     showMainWindow();
+/*  45 */     File smartCardFile = this.smartCardFileChooser.showOpenDialog(this.menuBar
+/*  46 */       .getScene().getWindow());
+/*  47 */     this.s.setSmartCardFile(smartCardFile);
+/*  48 */     if (smartCardFile != null) {
+/*  49 */       this.s.readSmartCardFile();
+/*     */     }
+/*  51 */     if ((this.s.getSmartCardFile() != null) && (this.s.getPrimaryStage() != null)) {
+/*  52 */       this.s.getPrimaryStage().getScene().lookup("#imgChecked")
+/*  53 */         .setVisible(true);
+/*     */     }
+/*  54 */     else if ((this.s.getSmartCardFile() == null) && (this.s.getPrimaryStage() != null))
+/*  55 */       this.s.getPrimaryStage().getScene().lookup("#imgChecked")
+/*  56 */         .setVisible(false);
+/*     */   }
+/*     */ 
+/*     */   public void createTan()
+/*     */   {
+/*  64 */     if (this.s.getSmartCardFile() == null)
+/*  65 */       new GuiError("scs.gui.error.noSmartCard");
+/*     */     else
+/*  67 */       showCreateTanWindow();
+/*     */   }
+/*     */ 
+/*     */   public void showAboutDialogue()
+/*     */   {
+/*     */     try
+/*     */     {
+/*  77 */       BorderPane about = (BorderPane)FXMLLoader.load(
+/*  78 */         getClass().getResource("/layouts/About.fxml"), this.s
+/*  79 */         .getStringBundle());
+/*     */ 
+/*  81 */       Stage dialog = new Stage();
+/*  82 */       dialog.initStyle(StageStyle.UTILITY);
+/*  83 */       dialog.setTitle(this.s.getStringBundle()
+/*  84 */         .getString("scs.gui.about.title"));
+/*     */ 
+/*  85 */       Scene scene = new Scene(about);
+/*  86 */       dialog.setScene(scene);
+/*  87 */       dialog.show();
+/*     */     }
+/*     */     catch (IOException e)
+/*     */     {
+/*  91 */       e.printStackTrace();
+/*     */     }
+/*     */   }
+/*     */ 
+/*     */   public void showCreateTanWindow()
+/*     */   {
+/*     */     try
+/*     */     {
+/* 100 */       if (this.s.getPrimaryStage() != null) {
+/* 101 */         Pane p = (Pane)FXMLLoader.load(
+/* 102 */           getClass().getResource("/layouts/CreateTan.fxml"), this.s
+/* 103 */           .getStringBundle());
+/* 104 */         this.s.getPrimaryStage().setScene(new Scene(p));
+/*     */       }
+/*     */     }
+/*     */     catch (IOException e) {
+/* 108 */       e.printStackTrace();
+/*     */     }
+/*     */   }
+/*     */ 
+/*     */   public void showMainWindow()
+/*     */   {
+/*     */     try
+/*     */     {
+/* 117 */       if (this.s.getPrimaryStage() != null)
+/*     */       {
+/* 119 */         Pane root = (Pane)FXMLLoader.load(
+/* 120 */           getClass().getResource("/layouts/Main.fxml"), this.s
+/* 121 */           .getStringBundle());
+/* 122 */         this.s.getPrimaryStage().setScene(new Scene(root));
+/*     */       }
+/*     */     }
+/*     */     catch (IOException e) {
+/* 126 */       e.printStackTrace();
+/*     */     }
+/*     */   }
+/*     */ 
+/*     */   public void close()
+/*     */   {
+/* 134 */     Platform.exit();
+/*     */   }
+/*     */ }
+
+/* Location:           /Volumes/MacintoshHD/Users/mep/Downloads/smartcard_reader_application.jar
+ * Qualified Name:     de.next9bank.scs.gui.controllers.MenuController
+ * JD-Core Version:    0.6.2
+ */
+\end{lstlisting}
+
+
+\section{Package \textit{gui}}
+
+\subsection{GuiEnterPin}
+
+\begin{lstlisting}
+// INTERNAL ERROR //
+
+/* Location:           /Volumes/MacintoshHD/Users/mep/Downloads/smartcard_reader_application.jar
+ * Qualified Name:     de.next9bank.scs.gui.GuiEnterPin
+ * JD-Core Version:    0.6.2
+ */
+\end{lstlisting}
+
+\subsection{GuiError}
+
+\begin{lstlisting}
+/*    */ package de.next9bank.scs.gui;
+/*    */ 
+/*    */ import de.next9bank.scs.model.Storage;
+/*    */ import java.util.ResourceBundle;
+/*    */ import org.controlsfx.dialog.Dialogs;
+/*    */ 
+/*    */ public class GuiError
+/*    */ {
+/*    */   Storage s;
+/*    */ 
+/*    */   public GuiError(String errorMsg)
+/*    */   {
+/* 15 */     this.s = Storage.getStorage();
+/*    */ 
+/* 17 */     Dialogs.create().owner(this.s.getPrimaryStage())
+/* 18 */       .title(this.s
+/* 18 */       .getStringBundle().getString("scs.gui.error.title"))
+/* 19 */       .message(this.s
+/* 19 */       .getStringBundle().getString(errorMsg)).showError();
+/*    */   }
+/*    */ }
+
+/* Location:           /Volumes/MacintoshHD/Users/mep/Downloads/smartcard_reader_application.jar
+ * Qualified Name:     de.next9bank.scs.gui.GuiError
+ * JD-Core Version:    0.6.2
+ */
+\end{lstlisting}
+
+\subsection{GuiShowTan}
+
+\begin{lstlisting}
+/*    */ package de.next9bank.scs.gui;
+/*    */ 
+/*    */ import de.next9bank.scs.model.Storage;
+/*    */ import java.util.ResourceBundle;
+/*    */ import org.controlsfx.dialog.Dialogs;
+/*    */ 
+/*    */ public class GuiShowTan
+/*    */ {
+/* 10 */   Storage s = Storage.getStorage();
+/*    */   String tan;
+/*    */ 
+/*    */   public GuiShowTan(String tan)
+/*    */   {
+/* 16 */     this.tan = tan;
+/*    */   }
+/*    */ 
+/*    */   public void showTan()
+/*    */   {
+/* 21 */     Dialogs.create()
+/* 22 */       .owner(this.s
+/* 22 */       .getPrimaryStage())
+/* 23 */       .title(this.s
+/* 23 */       .getStringBundle()
+/* 24 */       .getString("scs.gui.dialog.tan.title"))
+/* 25 */       .message(this.s
+/* 26 */       .getStringBundle().getString("scs.gui.dialog.tan.tan") + " " + this.tan)
+/* 27 */       .showInformation();
+/*    */   }
+/*    */ }
+
+/* Location:           /Volumes/MacintoshHD/Users/mep/Downloads/smartcard_reader_application.jar
+ * Qualified Name:     de.next9bank.scs.gui.GuiShowTan
+ * JD-Core Version:    0.6.2
+ */
+\end{lstlisting}
+
+\section{Package \textit{helpers}}
+
+\subsection{Encryption}
+
+\begin{lstlisting}
+/*    */ package de.next9bank.scs.helpers;
+/*    */ 
+/*    */ import java.security.MessageDigest;
+/*    */ import java.security.NoSuchAlgorithmException;
+/*    */ import java.util.Arrays;
+/*    */ 
+/*    */ public class Encryption
+/*    */ {
+/*    */   public static String Encrypt(String data, String password)
+/*    */   {
+/* 10 */     MCrypt mcrypt = new MCrypt(password + "0000000000");
+/*    */     try
+/*    */     {
+/* 13 */       return MCrypt.bytesToHex(mcrypt.encrypt(data));
+/*    */     }
+/*    */     catch (Exception e) {
+/*    */     }
+/* 17 */     return null;
+/*    */   }
+/*    */ 
+/*    */   public static String Decrypt(String encryptedData, String password)
+/*    */   {
+/* 23 */     MCrypt mcrypt = new MCrypt(password + "0000000000");
+/*    */     try
+/*    */     {
+/* 26 */       return new String(mcrypt.decrypt(encryptedData)).trim();
+/*    */     }
+/*    */     catch (Exception e) {
+/*    */     }
+/* 30 */     return null;
+/*    */   }
+/*    */ 
+/*    */   private static byte[] generateKey(byte[] key)
+/*    */     throws NoSuchAlgorithmException
+/*    */   {
+/* 44 */     MessageDigest sha = MessageDigest.getInstance("SHA-1");
+/* 45 */     key = sha.digest(key);
+/*    */ 
+/* 47 */     key = Arrays.copyOf(key, 16);
+/* 48 */     return key;
+/*    */   }
+/*    */ }
+
+/* Location:           /Volumes/MacintoshHD/Users/mep/Downloads/smartcard_reader_application.jar
+ * Qualified Name:     de.next9bank.scs.helpers.Encryption
+ * JD-Core Version:    0.6.2
+ */
+\end{lstlisting}
+
+\subsection{MCrypt}
+
+\begin{lstlisting}
+/*     */ package de.next9bank.scs.helpers;
+/*     */ 
+/*     */ import java.security.NoSuchAlgorithmException;
+/*     */ import javax.crypto.Cipher;
+/*     */ import javax.crypto.NoSuchPaddingException;
+/*     */ import javax.crypto.spec.IvParameterSpec;
+/*     */ import javax.crypto.spec.SecretKeySpec;
+/*     */ 
+/*     */ public class MCrypt
+/*     */ {
+/*  19 */   private String iv = "fedcba9876543210";
+/*     */   private IvParameterSpec ivspec;
+/*     */   private SecretKeySpec keyspec;
+/*     */   private Cipher cipher;
+/*     */ 
+/*     */   public MCrypt(String secretKey)
+/*     */   {
+/*  25 */     this.ivspec = new IvParameterSpec(this.iv.getBytes());
+/*     */ 
+/*  27 */     this.keyspec = new SecretKeySpec(secretKey.getBytes(), "AES");
+/*     */     try
+/*     */     {
+/*  30 */       this.cipher = Cipher.getInstance("AES/CBC/NoPadding");
+/*     */     }
+/*     */     catch (NoSuchAlgorithmException e) {
+/*  33 */       e.printStackTrace();
+/*     */     }
+/*     */     catch (NoSuchPaddingException e) {
+/*  36 */       e.printStackTrace();
+/*     */     }
+/*     */   }
+/*     */ 
+/*     */   public byte[] encrypt(String text) throws Exception {
+/*  41 */     if ((text == null) || (text.length() == 0)) {
+/*  42 */       throw new Exception("Empty string");
+/*     */     }
+/*  44 */     byte[] encrypted = null;
+/*     */     try
+/*     */     {
+/*  47 */       this.cipher.init(1, this.keyspec, this.ivspec);
+/*     */ 
+/*  49 */       encrypted = this.cipher.doFinal(padString(text).getBytes());
+/*     */     } catch (Exception e) {
+/*  51 */       throw new Exception("[encrypt] " + e.getMessage());
+/*     */     }
+/*     */ 
+/*  54 */     return encrypted;
+/*     */   }
+/*     */ 
+/*     */   public byte[] decrypt(String code) throws Exception {
+/*  58 */     if ((code == null) || (code.length() == 0)) {
+/*  59 */       throw new Exception("Empty string");
+/*     */     }
+/*  61 */     byte[] decrypted = null;
+/*     */     try
+/*     */     {
+/*  64 */       this.cipher.init(2, this.keyspec, this.ivspec);
+/*     */ 
+/*  66 */       decrypted = this.cipher.doFinal(hexToBytes(code));
+/*     */     } catch (Exception e) {
+/*  68 */       throw new Exception("[decrypt] " + e.getMessage());
+/*     */     }
+/*  70 */     return decrypted;
+/*     */   }
+/*     */ 
+/*     */   public static String bytesToHex(byte[] data) {
+/*  74 */     if (data == null) {
+/*  75 */       return null;
+/*     */     }
+/*     */ 
+/*  78 */     int len = data.length;
+/*  79 */     String str = "";
+/*  80 */     for (int i = 0; i < len; i++) {
+/*  81 */       if ((data[i] & 0xFF) < 16)
+/*  82 */         str = str + "0" + Integer.toHexString(data[i] & 0xFF);
+/*     */       else
+/*  84 */         str = str + Integer.toHexString(data[i] & 0xFF);
+/*     */     }
+/*  86 */     return str;
+/*     */   }
+/*     */ 
+/*     */   public static byte[] hexToBytes(String str) {
+/*  90 */     if (str == null)
+/*  91 */       return null;
+/*  92 */     if (str.length() < 2) {
+/*  93 */       return null;
+/*     */     }
+/*  95 */     int len = str.length() / 2;
+/*  96 */     byte[] buffer = new byte[len];
+/*  97 */     for (int i = 0; i < len; i++) {
+/*  98 */       buffer[i] = ((byte)Integer.parseInt(str
+/*  99 */         .substring(i * 2, i * 2 + 2), 
+/*  99 */         16));
+/*     */     }
+/* 101 */     return buffer;
+/*     */   }
+/*     */ 
+/*     */   private static String padString(String source)
+/*     */   {
+/* 106 */     char paddingChar = ' ';
+/* 107 */     int size = 16;
+/* 108 */     int x = source.length() % size;
+/* 109 */     int padLength = size - x;
+/*     */ 
+/* 111 */     for (int i = 0; i < padLength; i++) {
+/* 112 */       source = source + paddingChar;
+/*     */     }
+/*     */ 
+/* 115 */     return source;
+/*     */   }
+/*     */ }
+
+/* Location:           /Volumes/MacintoshHD/Users/mep/Downloads/smartcard_reader_application.jar
+ * Qualified Name:     de.next9bank.scs.helpers.MCrypt
+ * JD-Core Version:    0.6.2
+ */
+\end{lstlisting}
+
+\subsection{TanCreator}
+
+\begin{lstlisting}
+/*     */ package de.next9bank.scs.helpers;
+/*     */ 
+/*     */ import com.google.common.hash.HashCode;
+/*     */ import com.google.common.hash.Hashing;
+/*     */ import com.google.common.io.Files;
+/*     */ import de.next9bank.scs.model.Storage;
+/*     */ import java.io.File;
+/*     */ import java.io.IOException;
+/*     */ import java.io.UnsupportedEncodingException;
+/*     */ import java.security.MessageDigest;
+/*     */ import java.security.NoSuchAlgorithmException;
+/*     */ 
+/*     */ public class TanCreator
+/*     */ {
+/*  17 */   static Storage s = Storage.getStorage();
+/*     */ 
+/*     */   public static String createSingleTan(String sender, String receiver, String amount)
+/*     */   {
+/*  34 */     String hash = generateHash(s.getSeed() + receiver + amount + sender);
+/*  35 */     return getTanFromHash(hash);
+/*     */   }
+/*     */ 
+/*     */   public static String createBatchTan(String sender, File file)
+/*     */   {
+/*     */     try
+/*     */     {
+/*  47 */       HashCode md5 = Files.hash(file, Hashing.md5());
+/*  48 */       String md5Hex = md5.toString();
+/*  49 */       String hash = generateHash(s.getSeed() + sender + md5Hex);
+/*  50 */       return getTanFromHash(hash);
+/*     */     } catch (IOException e) {
+/*  52 */       e.printStackTrace();
+/*  53 */     }return null;
+/*     */   }
+/*     */ 
+/*     */   private static String getTanFromHash(String hash)
+/*     */   {
+/*  65 */     hash = hash.substring(0, 6);
+/*  66 */     int hashInt = Integer.parseInt(hash, 16);
+/*  67 */     hash = String.valueOf(hashInt).substring(0, 6);
+/*  68 */     return hash;
+/*     */   }
+/*     */ 
+/*     */   public static String getNextSeed()
+/*     */   {
+/*  77 */     String hash = generateHash(s.getSeed());
+/*  78 */     return hash;
+/*     */   }
+/*     */ 
+/*     */   private static String generateHash(String toHash)
+/*     */   {
+/*  88 */     MessageDigest md = null;
+/*  89 */     byte[] hash = null;
+/*     */     try {
+/*  91 */       md = MessageDigest.getInstance("SHA-512");
+/*  92 */       hash = md.digest(toHash.getBytes("UTF-8"));
+/*     */     } catch (NoSuchAlgorithmException e) {
+/*  94 */       e.printStackTrace();
+/*     */     } catch (UnsupportedEncodingException e) {
+/*  96 */       e.printStackTrace();
+/*     */     }
+/*  98 */     return convertToHex(hash);
+/*     */   }
+/*     */ 
+/*     */   private static String convertToHex(byte[] raw)
+/*     */   {
+/* 112 */     StringBuffer sb = new StringBuffer();
+/* 113 */     for (int i = 0; i < raw.length; i++) {
+/* 114 */       sb.append(Integer.toString((raw[i] & 0xFF) + 256, 16)
+/* 115 */         .substring(1));
+/*     */     }
+/*     */ 
+/* 117 */     return sb.toString();
+/*     */   }
+/*     */ }
+
+/* Location:           /Volumes/MacintoshHD/Users/mep/Downloads/smartcard_reader_application.jar
+ * Qualified Name:     de.next9bank.scs.helpers.TanCreator
+ * JD-Core Version:    0.6.2
+ */
+\end{lstlisting}
+
+\section{Package \textit{model}}
+
+\subsection{Storage}
+
+\begin{lstlisting}
+/*     */ package de.next9bank.scs.model;
+/*     */ 
+/*     */ import de.next9bank.scs.gui.GuiEnterPin;
+/*     */ import de.next9bank.scs.gui.GuiError;
+/*     */ import de.next9bank.scs.helpers.Encryption;
+/*     */ import java.io.BufferedWriter;
+/*     */ import java.io.File;
+/*     */ import java.io.FileWriter;
+/*     */ import java.io.IOException;
+/*     */ import java.nio.file.Files;
+/*     */ import java.util.ResourceBundle;
+/*     */ import javafx.stage.Stage;
+/*     */ 
+/*     */ public class Storage
+/*     */ {
+/*  18 */   private static Storage s = null;
+/*     */   private File smartCardFile;
+/*     */   private ResourceBundle stringBundle;
+/*     */   private Stage primaryStage;
+/*     */   private String seed;
+/*     */   private String lastTan;
+/*     */   private String password;
+/*     */ 
+/*     */   private Storage()
+/*     */   {
+/*  34 */     ResourceBundle stringBundle = ResourceBundle.getBundle("strings");
+/*  35 */     setStringBundle(stringBundle);
+/*     */   }
+/*     */ 
+/*     */   public static Storage getStorage()
+/*     */   {
+/*  44 */     if (s == null) {
+/*  45 */       s = new Storage();
+/*     */     }
+/*  47 */     return s;
+/*     */   }
+/*     */ 
+/*     */   public File getSmartCardFile() {
+/*  51 */     return this.smartCardFile;
+/*     */   }
+/*     */ 
+/*     */   public void setSmartCardFile(File smartCardFile) {
+/*  55 */     this.smartCardFile = smartCardFile;
+/*     */   }
+/*     */ 
+/*     */   public ResourceBundle getStringBundle() {
+/*  59 */     return this.stringBundle;
+/*     */   }
+/*     */ 
+/*     */   public void setStringBundle(ResourceBundle stringBundle) {
+/*  63 */     this.stringBundle = stringBundle;
+/*     */   }
+/*     */ 
+/*     */   public Stage getPrimaryStage() {
+/*  67 */     return this.primaryStage;
+/*     */   }
+/*     */ 
+/*     */   public void setPrimaryStage(Stage primaryStage) {
+/*  71 */     this.primaryStage = primaryStage;
+/*     */   }
+/*     */ 
+/*     */   public String getSeed() {
+/*  75 */     return this.seed;
+/*     */   }
+/*     */ 
+/*     */   public boolean setSeed(String seed) {
+/*  79 */     this.seed = seed;
+/*  80 */     return true;
+/*     */   }
+/*     */ 
+/*     */   public boolean writeNewSeed(String seed) {
+/*  84 */     setSeed(seed);
+/*     */     try
+/*     */     {
+/*  88 */       FileWriter fw = new FileWriter(getSmartCardFile(), false);
+/*  89 */       BufferedWriter bw = new BufferedWriter(fw);
+/*     */ 
+/*  91 */       String s = Encryption.Encrypt(seed, getPassword());
+/*     */ 
+/*  93 */       bw.write(s);
+/*  94 */       bw.close();
+/*     */ 
+/*  96 */       return true;
+/*     */     } catch (IOException e) {
+/*  98 */       e.printStackTrace();
+/*  99 */     }return false;
+/*     */   }
+/*     */ 
+/*     */   public boolean encryptAndSetSeed(String seed, String password)
+/*     */   {
+/* 104 */     String s = Encryption.Decrypt(seed, password);
+/* 105 */     if (s != null) {
+/* 106 */       return setSeed(s);
+/*     */     }
+/* 108 */     return false;
+/*     */   }
+/*     */ 
+/*     */   public void readSmartCardFile() {
+/*     */     try {
+/* 113 */       GuiEnterPin p = new GuiEnterPin();
+/* 114 */       String password = p.getPassword();
+/*     */ 
+/* 116 */       if (password != null) {
+/* 117 */         setPassword(password);
+/* 118 */         if (!encryptAndSetSeed(new String(
+/* 119 */           Files.readAllBytes(this.smartCardFile
+/* 119 */           .toPath()), "UTF-8"), password))
+/*     */         {
+/* 123 */           new GuiError("scs.gui.error.smartCardCorrupted");
+/* 124 */           setSmartCardFile(null);
+/*     */         }
+/*     */       } else {
+/* 127 */         new GuiError("scs.gui.error.smartCardCorrupted");
+/* 128 */         setSmartCardFile(null);
+/*     */       }
+/*     */     }
+/*     */     catch (Exception e) {
+/* 132 */       setSmartCardFile(null);
+/* 133 */       new GuiError("scs.gui.error.smartCardCorrupted");
+/*     */ 
+/* 135 */       e.printStackTrace();
+/*     */     }
+/*     */   }
+/*     */ 
+/*     */   public String getLastTan() {
+/* 140 */     return this.lastTan;
+/*     */   }
+/*     */ 
+/*     */   public void setLastTan(String lastTan) {
+/* 144 */     this.lastTan = lastTan;
+/*     */   }
+/*     */ 
+/*     */   public String getPassword() {
+/* 148 */     return this.password;
+/*     */   }
+/*     */ 
+/*     */   public void setPassword(String password) {
+/* 152 */     this.password = password;
+/*     */   }
+/*     */ }
+
+/* Location:           /Volumes/MacintoshHD/Users/mep/Downloads/smartcard_reader_application.jar
+ * Qualified Name:     de.next9bank.scs.model.Storage
+ * JD-Core Version:    0.6.2
+ */
+\end{lstlisting}
+
+\section{Main class}
+
+\subsection{Main}
+
+\begin{lstlisting}
+/*    */ package de.next9bank.scs;
+/*    */ 
+/*    */ import de.next9bank.scs.model.Storage;
+/*    */ import java.io.IOException;
+/*    */ import java.util.ResourceBundle;
+/*    */ import javafx.application.Application;
+/*    */ import javafx.collections.ObservableList;
+/*    */ import javafx.fxml.FXMLLoader;
+/*    */ import javafx.scene.Scene;
+/*    */ import javafx.scene.image.Image;
+/*    */ import javafx.scene.layout.Pane;
+/*    */ import javafx.stage.Stage;
+/*    */ 
+/*    */ public class Main extends Application
+/*    */ {
+/* 22 */   Storage s = Storage.getStorage();
+/*    */ 
+/*    */   public void start(Stage primaryStage)
+/*    */   {
+/*    */     try
+/*    */     {
+/* 32 */       showMainStage(primaryStage);
+/*    */     }
+/*    */     catch (Exception e) {
+/* 35 */       e.printStackTrace();
+/*    */     }
+/*    */   }
+/*    */ 
+/*    */   private void showMainStage(Stage primaryStage) throws IOException
+/*    */   {
+/* 41 */     Pane root = (Pane)FXMLLoader.load(getClass()
+/* 42 */       .getResource("/layouts/Main.fxml"), 
+/* 42 */       this.s.getStringBundle());
+/* 43 */     Scene scene = new Scene(root, 600.0D, 400.0D);
+/* 44 */     primaryStage.setTitle(this.s.getStringBundle().getString("scs.title"));
+/* 45 */     Image ico = new Image("/img/logo.png");
+/* 46 */     primaryStage.getIcons().add(ico);
+/* 47 */     primaryStage.setScene(scene);
+/* 48 */     primaryStage.setResizable(false);
+/* 49 */     primaryStage.show();
+/*    */ 
+/* 51 */     this.s.setPrimaryStage(primaryStage);
+/*    */   }
+/*    */ 
+/*    */   public static void main(String[] args)
+/*    */   {
+/* 61 */     launch(args);
+/*    */   }
+/*    */ }
+
+/* Location:           /Volumes/MacintoshHD/Users/mep/Downloads/smartcard_reader_application.jar
+ * Qualified Name:     de.next9bank.scs.Main
+ * JD-Core Version:    0.6.2
+ */
+\end{lstlisting}

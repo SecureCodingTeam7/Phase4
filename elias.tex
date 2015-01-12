@@ -1,4 +1,5 @@
 \chapter{CWE-329: Use of static IV with Rijndael CBC}
+\label{chapter:static_iv}
 
 Next9 bank makes use of a 512 bit hash value $scs_{seed}$. This value is used to generate TANs for the smart card simulator. It is recalculated after each successful transaction. The $scs_{seed}$ is generated on the server side and then encrypted using the Rijndael algorithm with a block size of 128 bits and a 128 bit key $k_{enc}$ (according to the AES-128 standard): $$enc_{k_{enc}} (scs_{seed}).$$
 The encrypted 512 bit hash is saved to a file, which is then offered to the user for download. 
@@ -38,6 +39,8 @@ IvParameterSpec ivspec = new IvParameterSpec(iv);
 \end{lstlisting}
 
 \chapter{Weakness in key generation and padding}
+\label{chapter:weak_key}
+
 The effectiveness of a symmetric encryption algorithm in terms of the provided confidentiality is always depended on the key size. An advanced encryption standard, such as AES is not a silver bullet. The security of symmetric encryption algorithms is quickly compromised if configured with insufficient care.
 
 
